@@ -204,19 +204,9 @@ export default async function HomePage() {
                 <p className="text-sm text-[var(--text-secondary)] mb-4">
                   Tin tức công nghệ mới nhất mỗi tuần qua email.
                 </p>
-                <form className="space-y-2.5">
-                  <input
-                    type="email"
-                    placeholder="email@example.com"
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20 transition-all"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-white hover:bg-[var(--accent-hover)] transition-colors"
-                  >
-                    Đăng ký
-                  </button>
-                </form>
+                <div className="text-sm text-[var(--text-muted)] italic border border-dashed border-[var(--border)] rounded-lg p-4 text-center">
+                  Tính năng newsletter sẽ sớm ra mắt.
+                </div>
               </div>
             </div>
           </div>
