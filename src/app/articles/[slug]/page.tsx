@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { client } from "@/lib/sanity";
 import { ARTICLE_BY_SLUG, RELATED_ARTICLES } from "@/lib/queries";
+import { SITE_URL } from "@/lib/constants";
 import { ArticleCard } from "@/components/ArticleCard";
 import { PortableText } from "@/components/PortableText";
 import type { Article } from "@/types";
@@ -55,6 +56,9 @@ export async function generateMetadata({ params }: PageProps) {
   return {
     title: article.seo?.metaTitle || article.title,
     description: article.seo?.metaDescription || article.excerpt,
+    alternates: {
+      canonical: `${SITE_URL}/articles/${article.slug.current}`,
+    },
     openGraph: {
       title: article.title,
       description: article.excerpt,

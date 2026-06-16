@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { client } from "@/lib/sanity";
 import { ARTICLES_BY_CATEGORY, ALL_CATEGORIES } from "@/lib/queries";
+import { SITE_URL } from "@/lib/constants";
 import { ArticleCard } from "@/components/ArticleCard";
 import type { Article, Category } from "@/types";
 
@@ -26,6 +27,9 @@ export async function generateMetadata({ params }: PageProps) {
   return {
     title: category?.title || "Chủ đề",
     description: category?.description || `Tin tức về ${category?.title}`,
+    alternates: {
+      canonical: `${SITE_URL}/categories/${slug}`,
+    },
   };
 }
 

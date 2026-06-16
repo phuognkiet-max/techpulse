@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "TechPulse — Tin Tức Công Nghệ Mới Nhất",
-    template: "%s | TechPulse",
+    default: `${SITE_NAME} — Tin Tức Công Nghệ Mới Nhất`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "TechPulse — Nguồn tin công nghệ đáng tin cậy. Cập nhật tin tức AI, Smartphone, Startup, Software, Hardware mỗi ngày.",
+  description: SITE_DESCRIPTION,
   keywords: [
     "tin tức công nghệ",
     "công nghệ AI",
