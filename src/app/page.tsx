@@ -51,7 +51,15 @@ export default async function HomePage() {
             <div className="lg:col-span-2">
               <Link href={`/articles/${heroArticle.slug.current}`}>
                 <article className="group relative overflow-hidden rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-lg)] transition-all duration-300">
-                  <div className="relative h-72 md:h-80 bg-[var(--bg-tertiary)]">
+                  <div className="relative h-72 md:h-80 bg-[var(--bg-tertiary)] overflow-hidden">
+                    {/* Cover image */}
+                    {(heroArticle.coverImageUrl || heroArticle.coverImage) && (
+                      <img
+                        src={heroArticle.coverImageUrl || heroArticle.coverImage}
+                        alt={heroArticle.title}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
                     <div className="absolute top-4 left-4 z-20">
                       <span className="inline-flex items-center rounded-md bg-[var(--accent)] px-2.5 py-1 text-xs font-semibold text-white">
@@ -80,7 +88,23 @@ export default async function HomePage() {
             <div className="flex flex-col gap-4">
               {sideArticles.map((article) => (
                 <Link key={article._id} href={`/articles/${article.slug.current}`}>
-                  <article className="group flex gap-3 p-3 rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-md)] transition-all duration-200">
+                  <article className="group flex gap-3 p-3 rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-md)] transition-all duration-200 overflow-hidden">
+                    {/* Side article thumbnail */}
+                    <div className="h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-[var(--bg-tertiary)]">
+                      {(article.coverImageUrl || article.coverImage) ? (
+                        <img
+                          src={article.coverImageUrl || article.coverImage}
+                          alt={article.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg className="w-6 h-6 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <span className={`inline-block text-[10px] font-semibold uppercase tracking-wider mb-1 ${getCategoryTextColor(article.category?.color)}`}>
                         {article.category?.title}
