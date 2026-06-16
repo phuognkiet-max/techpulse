@@ -13,6 +13,7 @@ const SEARCH_ARTICLES = `*[_type == "article" && (title match $searchQuery || ex
   excerpt,
   publishedAt,
   coverImage,
+  coverImageUrl,
   "category": category->{ title, slug, color },
   "author": author->{ name }
 }`;
@@ -40,17 +41,17 @@ function SearchContent() {
   }, [query]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-8 md:py-12">
       {/* Search Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
-          Ket qua tim kiem
+          Kết quả tìm kiếm
         </h1>
         {query && (
           <p className="text-[var(--text-secondary)]">
             {loading
-              ? "Dang tim kiem..."
-              : `${articles.length} ket qua cho "${query}"`}
+              ? "Đang tìm kiếm..."
+              : `${articles.length} kết quả cho "${query}"`}
           </p>
         )}
       </div>
@@ -59,7 +60,7 @@ function SearchContent() {
       <form className="mb-8" action="/search" method="GET">
         <div className="relative max-w-2xl">
           <svg
-            className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-secondary)]"
+            className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -75,8 +76,8 @@ function SearchContent() {
             type="text"
             name="q"
             defaultValue={query}
-            placeholder="Tim kiem bai viet..."
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-4 text-[var(--text-primary)] placeholder-[var(--text-secondary)] outline-none focus:border-[var(--accent)] transition-colors"
+            placeholder="Tìm kiếm bài viết..."
+            className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] py-3 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20 transition-all"
             autoFocus
           />
         </div>
@@ -84,10 +85,10 @@ function SearchContent() {
 
       {/* Sanity not configured */}
       {!client && (
-        <div className="mb-8 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-6 text-center">
-          <p className="text-yellow-400 font-medium">⚠️ Sanity CMS chua duoc cau hinh</p>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
-            Vui long them NEXT_PUBLIC_SANITY_PROJECT_ID vao .env.local
+        <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 p-5 text-center">
+          <p className="text-amber-700 font-medium">Sanity CMS chưa được cấu hình</p>
+          <p className="text-sm text-amber-600 mt-1">
+            Vui lòng thêm NEXT_PUBLIC_SANITY_PROJECT_ID vào .env.local
           </p>
         </div>
       )}
@@ -96,32 +97,30 @@ function SearchContent() {
       {loading ? (
         <div className="text-center py-16">
           <div className="animate-spin h-8 w-8 border-2 border-[var(--accent)] border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-[var(--text-secondary)]">Dang tim kiem...</p>
+          <p className="text-[var(--text-secondary)]">Đang tìm kiếm...</p>
         </div>
       ) : articles.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {articles.map((article) => (
             <ArticleCard key={article._id} article={article} />
           ))}
         </div>
       ) : query ? (
         <div className="text-center py-16">
-          <div className="text-4xl mb-4">🔍</div>
           <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">
-            Khong tim thay ket qua
+            Không tìm thấy kết quả
           </h2>
           <p className="text-[var(--text-secondary)]">
-            Thu tim kiem voi tu khoa khac
+            Thử tìm kiếm với từ khóa khác
           </p>
         </div>
       ) : (
         <div className="text-center py-16">
-          <div className="text-4xl mb-4">🔍</div>
           <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">
-            Nhap tu khoa de tim kiem
+            Nhập từ khóa để tìm kiếm
           </h2>
           <p className="text-[var(--text-secondary)]">
-            Tim kiem bai viet ve AI, Smartphone, Startup...
+            Tìm kiếm bài viết về AI, Smartphone, Startup...
           </p>
         </div>
       )}
@@ -131,7 +130,7 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="text-center py-16 text-[var(--text-secondary)]">Dang tai...</div>}>
+    <Suspense fallback={<div className="text-center py-16 text-[var(--text-secondary)]">Đang tải...</div>}>
       <SearchContent />
     </Suspense>
   );
