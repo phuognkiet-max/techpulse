@@ -5,6 +5,7 @@ import { client } from "@/lib/sanity";
 import { SITE_SETTINGS } from "@/lib/queries";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Analytics } from "@/components/Analytics";
 import type { SiteSettings } from "@/types";
 
 async function getSiteSettings(): Promise<SiteSettings | null> {
@@ -50,6 +51,7 @@ export default async function RootLayout({
   return (
     <html lang="vi">
       <body className="min-h-screen flex flex-col bg-white text-[var(--text-primary)]">
+        <Analytics />
         <Header siteTitle={siteSettings?.title} />
         <main className="flex-1">{children}</main>
         <Footer siteSettings={siteSettings} />
