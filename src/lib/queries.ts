@@ -111,6 +111,7 @@ export const SITE_SETTINGS = `*[_type == "siteSettings"][0] {
   title,
   description,
   logo,
+  footerDescription,
   social
 }`;
 

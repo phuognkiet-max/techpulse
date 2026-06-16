@@ -21,6 +21,12 @@ export default {
       type: 'image',
     },
     {
+      name: 'footerDescription',
+      title: 'Mô tả footer',
+      type: 'text',
+      initialValue: 'Nguồn tin công nghệ đáng tin cậy. Cập nhật tin tức AI, Smartphone, Startup, Software, Hardware mỗi ngày.',
+    },
+    {
       name: 'social',
       title: 'Mạng xã hội',
       type: 'object',
@@ -28,6 +34,8 @@ export default {
         { name: 'twitter', title: 'Twitter/X', type: 'url' },
         { name: 'facebook', title: 'Facebook', type: 'url' },
         { name: 'github', title: 'GitHub', type: 'url' },
+        { name: 'youtube', title: 'YouTube', type: 'url' },
+        { name: 'tiktok', title: 'TikTok', type: 'url' },
       ],
     },
   ],

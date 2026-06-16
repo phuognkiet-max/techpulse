@@ -13,7 +13,11 @@ const navLinks = [
   { href: "/categories/hardware", label: "Hardware" },
 ];
 
-export function Header() {
+interface HeaderProps {
+  siteTitle?: string;
+}
+
+export function Header({ siteTitle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 

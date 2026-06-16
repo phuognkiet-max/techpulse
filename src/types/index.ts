@@ -48,9 +48,12 @@ export interface SiteSettings {
   title: string;
   description: string;
   logo?: string;
+  footerDescription?: string;
   social?: {
     twitter?: string;
     facebook?: string;
     github?: string;
+    youtube?: string;
+    tiktok?: string;
   };
 }
