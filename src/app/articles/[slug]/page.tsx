@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { client } from "@/lib/sanity";
 import { ARTICLE_BY_SLUG, RELATED_ARTICLES } from "@/lib/queries";
 import { ArticleCard } from "@/components/ArticleCard";
+import { PortableText } from "@/components/PortableText";
 import type { Article } from "@/types";
 
 export const revalidate = 60;
@@ -218,23 +219,9 @@ export default async function ArticlePage({ params }: PageProps) {
 
           {/* Body Content */}
           <div className="article-body max-w-none">
-            {article.body?.map((block: any, i: number) => {
-              if (block._type === "block") {
-                const text = block.children
-                  ?.map((child: any) => child.text)
-                  .join("");
-                if (block.style === "h2") {
-                  return <h2 key={i}>{text}</h2>;
-                }
-                if (block.style === "h3") {
-                  return <h3 key={i}>{text}</h3>;
-                }
-                return <p key={i}>{text}</p>;
-              }
-              return null;
-            })}
-
-            {(!article.body || article.body.length === 0) && (
+            {article.body && article.body.length > 0 ? (
+              <PortableText value={article.body} />
+            ) : (
               <p className="text-[var(--text-secondary)]">
                 Nội dung bài viết đang được cập nhật. Vui lòng quay lại sau.
               </p>
