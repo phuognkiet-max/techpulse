@@ -59,6 +59,15 @@ export async function generateMetadata({ params }: PageProps) {
       description: article.excerpt,
       type: "article",
       publishedTime: article.publishedAt,
+      images: article.coverImageUrl ? [{ url: article.coverImageUrl, width: 1200, height: 630 }] : [],
+      authors: [article.author?.name || "TechPulse"],
+      siteName: "TechPulse",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+      images: article.coverImageUrl ? [article.coverImageUrl] : [],
     },
   };
 }
@@ -79,6 +88,37 @@ export default async function ArticlePage({ params }: PageProps) {
   const coverSrc = article.coverImage || (article as any).coverImageUrl || null;
 
   return (
+    <>
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'NewsArticle',
+            headline: article.title,
+            description: article.excerpt,
+            image: article.coverImageUrl || article.coverImage || '',
+            datePublished: article.publishedAt,
+            author: {
+              '@type': 'Person',
+              name: article.author?.name || 'TechPulse',
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: 'TechPulse',
+              logo: {
+                '@type': 'ImageObject',
+                url: 'https://techpulse-pink.vercel.app/logo.png',
+              },
+            },
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': `https://techpulse-pink.vercel.app/articles/${article.slug.current}`,
+            },
+          }),
+        }}
+      />
     <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-8 md:py-12">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-8">
@@ -239,5 +279,6 @@ export default async function ArticlePage({ params }: PageProps) {
         </aside>
       </div>
     </div>
+    </>
   );
 }
