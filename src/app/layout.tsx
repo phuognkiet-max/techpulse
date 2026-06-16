@@ -33,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="dark">
-      <body className="min-h-screen flex flex-col">
+    <html lang="vi">
+      <body className="min-h-screen flex flex-col bg-white text-[var(--text-primary)]">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { client } from "@/lib/sanity";
 import { ARTICLE_BY_SLUG, RELATED_ARTICLES } from "@/lib/queries";
@@ -15,16 +16,28 @@ function formatDate(dateString: string) {
   });
 }
 
-function getCategoryColor(color?: string) {
-  const colors: Record<string, string> = {
-    blue: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    green: "bg-green-500/10 text-green-400 border-green-500/20",
-    orange: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-    red: "bg-red-500/10 text-red-400 border-red-500/20",
-    cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+function getCategoryTextColor(color?: string) {
+  const styles: Record<string, string> = {
+    blue: "text-[var(--cat-ai)]",
+    purple: "text-[var(--cat-ai)]",
+    green: "text-[var(--cat-software)]",
+    orange: "text-[var(--cat-startup)]",
+    red: "text-[var(--cat-hardware)]",
+    cyan: "text-[var(--cat-mobile)]",
   };
-  return colors[color || "blue"] || colors.blue;
+  return styles[color || "blue"] || styles.blue;
+}
+
+function getCategoryBg(color?: string) {
+  const styles: Record<string, string> = {
+    blue: "bg-[var(--cat-ai)]",
+    purple: "bg-[var(--cat-ai)]",
+    green: "bg-[var(--cat-software)]",
+    orange: "bg-[var(--cat-startup)]",
+    red: "bg-[var(--cat-hardware)]",
+    cyan: "bg-[var(--cat-mobile)]",
+  };
+  return styles[color || "blue"] || styles.blue;
 }
 
 interface PageProps {
@@ -32,11 +45,11 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  if (!client) return { title: "Bai viet khong tim thay" };
-  
+  if (!client) return { title: "Bài viết không tìm thấy" };
+
   const { slug } = await params;
   const article = await client.fetch<Article>(ARTICLE_BY_SLUG, { slug });
-  if (!article) return { title: "Bai viet khong tim thay" };
+  if (!article) return { title: "Bài viết không tìm thấy" };
 
   return {
     title: article.seo?.metaTitle || article.title,
@@ -52,7 +65,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function ArticlePage({ params }: PageProps) {
   if (!client) notFound();
-  
+
   const { slug } = await params;
   const article = await client.fetch<Article>(ARTICLE_BY_SLUG, { slug });
 
@@ -63,43 +76,47 @@ export default async function ArticlePage({ params }: PageProps) {
     categoryId: article.category?._id,
   });
 
+  const coverSrc = article.coverImage || null;
+
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-8 md:py-12">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-8">
-        <Link href="/" className="hover:text-[var(--text-primary)] transition-colors">
-          Trang chu
+      <nav className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-8">
+        <Link href="/" className="hover:text-[var(--accent)] transition-colors">
+          Trang chủ
         </Link>
-        <span>/</span>
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
         <Link
           href={`/categories/${article.category?.slug?.current}`}
-          className="hover:text-[var(--text-primary)] transition-colors"
+          className="hover:text-[var(--accent)] transition-colors"
         >
           {article.category?.title}
         </Link>
-        <span>/</span>
-        <span className="text-[var(--text-primary)] truncate max-w-[200px]">
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        <span className="text-[var(--text-secondary)] truncate max-w-[200px]">
           {article.title}
         </span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Main Content */}
         <article className="lg:col-span-2">
           {/* Category Badge */}
           <div className="mb-4">
             <Link
               href={`/categories/${article.category?.slug?.current}`}
-              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${getCategoryColor(
-                article.category?.color
-              )}`}
+              className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold text-white ${getCategoryBg(article.category?.color)}`}
             >
               {article.category?.title}
             </Link>
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 leading-tight">
+          <h1 className="text-3xl md:text-[2.5rem] font-bold text-[var(--text-primary)] mb-4 leading-tight tracking-tight">
             {article.title}
           </h1>
 
@@ -109,29 +126,48 @@ export default async function ArticlePage({ params }: PageProps) {
           </p>
 
           {/* Author & Meta */}
-          <div className="flex items-center gap-4 mb-8 pb-8 border-b border-[var(--border)]">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--gradient-start)] to-[var(--gradient-end)]" />
+          <div className="flex items-center gap-3 mb-8 pb-8 border-b border-[var(--border)]">
+            <div className="h-10 w-10 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-bold text-[var(--text-muted)]">
+              {article.author?.name?.charAt(0) || "T"}
+            </div>
             <div>
-              <p className="text-sm font-medium text-[var(--text-primary)]">
+              <p className="text-sm font-semibold text-[var(--text-primary)]">
                 {article.author?.name}
               </p>
-              <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+              <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
                 <time>{formatDate(article.publishedAt)}</time>
                 {article.readingTime && (
                   <>
                     <span>·</span>
-                    <span>{article.readingTime} phut doc</span>
+                    <span>{article.readingTime} phút đọc</span>
                   </>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Cover Image Placeholder */}
-          <div className="w-full h-64 md:h-96 rounded-xl bg-gradient-to-br from-[var(--gradient-start)]/20 to-[var(--gradient-end)]/20 mb-8" />
+          {/* Cover Image */}
+          {coverSrc ? (
+            <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-8 bg-[var(--bg-tertiary)]">
+              <Image
+                src={coverSrc}
+                alt={article.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 66vw"
+                priority
+              />
+            </div>
+          ) : (
+            <div className="w-full h-64 md:h-80 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center mb-8">
+              <svg className="w-16 h-16 text-[var(--border)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+            </div>
+          )}
 
           {/* Body Content */}
-          <div className="article-body prose prose-invert max-w-none">
+          <div className="article-body max-w-none">
             {article.body?.map((block: any, i: number) => {
               if (block._type === "block") {
                 const text = block.children
@@ -150,19 +186,19 @@ export default async function ArticlePage({ params }: PageProps) {
 
             {(!article.body || article.body.length === 0) && (
               <p className="text-[var(--text-secondary)]">
-                Noi dung bai viet dang duoc cap nhat. Vui long quay lai sau.
+                Nội dung bài viết đang được cập nhật. Vui lòng quay lại sau.
               </p>
             )}
           </div>
 
           {/* Tags */}
           {article.tags && article.tags.length > 0 && (
-            <div className="mt-8 pt-8 border-t border-[var(--border)]">
+            <div className="mt-8 pt-6 border-t border-[var(--border)]">
               <div className="flex flex-wrap gap-2">
                 {article.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full bg-[var(--bg-card)] border border-[var(--border)] px-3 py-1 text-xs text-[var(--text-secondary)]"
+                    className="rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] px-3 py-1 text-xs text-[var(--text-secondary)]"
                   >
                     #{tag}
                   </span>
@@ -175,11 +211,11 @@ export default async function ArticlePage({ params }: PageProps) {
         {/* Sidebar */}
         <aside className="lg:col-span-1">
           {relatedArticles.length > 0 && (
-            <div className="sticky top-24">
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">
-                Bai viet lien quan
+            <div className="sticky top-20">
+              <h3 className="text-base font-bold text-[var(--text-primary)] mb-4">
+                Bài viết liên quan
               </h3>
-              <div className="space-y-0">
+              <div>
                 {relatedArticles.map((related) => (
                   <ArticleCard
                     key={related._id}
