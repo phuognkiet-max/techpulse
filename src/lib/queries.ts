@@ -1,4 +1,4 @@
-// GROQ Queries for TechNews
+// GROQ Queries for TechPulse
 
 export const ALL_ARTICLES = `*[_type == "article"] | order(publishedAt desc) {
   _id,
@@ -8,6 +8,7 @@ export const ALL_ARTICLES = `*[_type == "article"] | order(publishedAt desc) {
   publishedAt,
   featured,
   coverImage,
+  coverImageUrl,
   tags,
   readingTime,
   "category": category->{
@@ -31,6 +32,7 @@ export const FEATURED_ARTICLES = `*[_type == "article" && featured == true] | or
   excerpt,
   publishedAt,
   coverImage,
+  coverImageUrl,
   "category": category->{
     title,
     slug,
@@ -51,6 +53,7 @@ export const ARTICLE_BY_SLUG = `*[_type == "article" && slug.current == $slug][0
   publishedAt,
   featured,
   coverImage,
+  coverImageUrl,
   tags,
   readingTime,
   "category": category->{
@@ -75,6 +78,7 @@ export const ARTICLES_BY_CATEGORY = `*[_type == "article" && category->slug.curr
   excerpt,
   publishedAt,
   coverImage,
+  coverImageUrl,
   "category": category->{
     title,
     slug,
@@ -116,6 +120,7 @@ export const RELATED_ARTICLES = `*[_type == "article" && _id != $id && category.
   slug,
   excerpt,
   coverImage,
+  coverImageUrl,
   "category": category->{ title, slug, color },
   "author": author->{ name }
 }`;
@@ -127,6 +132,7 @@ export const SEARCH_ARTICLES = `*[_type == "article" && (title match $query || e
   excerpt,
   publishedAt,
   coverImage,
+  coverImageUrl,
   "category": category->{ title, slug, color },
   "author": author->{ name }
 }`;

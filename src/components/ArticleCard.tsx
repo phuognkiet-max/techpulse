@@ -34,36 +34,71 @@ function getCategoryTextColor(color?: string) {
   return styles[color || "blue"] || styles.blue;
 }
 
+/** Resolve the best cover image: Sanity asset > external URL > null */
+function getCoverSrc(article: Article): string | null {
+  if (article.coverImage) return article.coverImage;
+  if ((article as any).coverImageUrl) return (article as any).coverImageUrl;
+  return null;
+}
+
+function CoverImage({
+  src,
+  alt,
+  className = "",
+  sizes,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  sizes?: string;
+}) {
+  // External URLs (http/https) — use <img> for simplicity (no next/image domain config needed)
+  if (src.startsWith("http")) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={alt}
+        className={`object-cover ${className}`}
+        loading="lazy"
+      />
+    );
+  }
+  // Sanity asset — use next/image
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      className={`object-cover ${className}`}
+      sizes={sizes}
+    />
+  );
+}
+
 interface ArticleCardProps {
   article: Article;
   variant?: "default" | "featured" | "compact";
 }
 
 export function ArticleCard({ article, variant = "default" }: ArticleCardProps) {
-  const coverSrc = article.coverImage || null;
+  const coverSrc = getCoverSrc(article);
 
   if (variant === "featured") {
     return (
       <Link href={`/articles/${article.slug.current}`}>
         <article className="group overflow-hidden rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-lg)] transition-all duration-300">
-          {/* Cover Image */}
           <div className="relative h-52 overflow-hidden bg-[var(--bg-tertiary)]">
             {coverSrc ? (
-              <Image
+              <CoverImage
                 src={coverSrc}
                 alt={article.title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                className="group-hover:scale-105 transition-transform duration-500"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[var(--bg-tertiary)] to-[var(--border)] flex items-center justify-center">
-                <svg className="w-10 h-10 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                </svg>
-              </div>
+              <PlaceholderIcon />
             )}
-            {/* Category badge */}
             <div className="absolute top-3 left-3">
               <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold text-white ${getCategoryStyle(article.category?.color)}`}>
                 {article.category?.title}
@@ -99,15 +134,12 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
     return (
       <Link href={`/articles/${article.slug.current}`}>
         <article className="group flex gap-4 py-3.5 border-b border-[var(--border-light)] last:border-0 hover:bg-[var(--bg-secondary)] -mx-2 px-2 rounded-lg transition-all">
-          {/* Thumbnail */}
           <div className="h-[72px] w-[72px] flex-shrink-0 rounded-lg overflow-hidden bg-[var(--bg-tertiary)]">
             {coverSrc ? (
-              <Image
+              <CoverImage
                 src={coverSrc}
                 alt={article.title}
-                width={72}
-                height={72}
-                className="w-full h-full object-cover"
+                className="w-full h-full"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -136,24 +168,17 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
   return (
     <Link href={`/articles/${article.slug.current}`}>
       <article className="group overflow-hidden rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-md)] transition-all duration-300">
-        {/* Cover Image */}
         <div className="relative h-44 overflow-hidden bg-[var(--bg-tertiary)]">
           {coverSrc ? (
-            <Image
+            <CoverImage
               src={coverSrc}
               alt={article.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="group-hover:scale-105 transition-transform duration-500"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[var(--bg-tertiary)] to-[var(--border)] flex items-center justify-center">
-              <svg className="w-8 h-8 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-              </svg>
-            </div>
+            <PlaceholderIcon />
           )}
-          {/* Category dot */}
           <div className="absolute top-3 left-3">
             <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold text-white ${getCategoryStyle(article.category?.color)}`}>
               {article.category?.title}
@@ -175,5 +200,15 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
         </div>
       </article>
     </Link>
+  );
+}
+
+function PlaceholderIcon() {
+  return (
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--bg-tertiary)] to-[var(--border)]">
+      <svg className="w-10 h-10 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+      </svg>
+    </div>
   );
 }

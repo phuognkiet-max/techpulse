@@ -64,9 +64,15 @@ export default {
     },
     {
       name: 'coverImage',
-      title: 'Ảnh bìa',
+      title: 'Ảnh bìa (Sanity)',
       type: 'image',
       options: { hotspot: true },
+    },
+    {
+      name: 'coverImageUrl',
+      title: 'Ảnh bìa (URL)',
+      type: 'url',
+      description: 'URL ảnh bìa bên ngoài (Unsplash, Pexels...). Ưu tiên hơn Sanity image nếu có.',
     },
     {
       name: 'category',

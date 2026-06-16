@@ -76,7 +76,7 @@ export default async function ArticlePage({ params }: PageProps) {
     categoryId: article.category?._id,
   });
 
-  const coverSrc = article.coverImage || null;
+  const coverSrc = article.coverImage || (article as any).coverImageUrl || null;
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-8 md:py-12">
@@ -149,14 +149,24 @@ export default async function ArticlePage({ params }: PageProps) {
           {/* Cover Image */}
           {coverSrc ? (
             <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-8 bg-[var(--bg-tertiary)]">
-              <Image
-                src={coverSrc}
-                alt={article.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 66vw"
-                priority
-              />
+              {coverSrc.startsWith('http') ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={coverSrc}
+                  alt={article.title}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+              ) : (
+                <Image
+                  src={coverSrc}
+                  alt={article.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 66vw"
+                  priority
+                />
+              )}
             </div>
           ) : (
             <div className="w-full h-64 md:h-80 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center mb-8">

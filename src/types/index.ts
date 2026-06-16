@@ -37,6 +37,7 @@ export interface Article {
   category: Category;
   tags?: string[];
   readingTime?: number;
+  coverImageUrl?: string;
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
