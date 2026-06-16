@@ -72,7 +72,7 @@ export default function AboutPage() {
             {
               icon: "🧠",
               title: "Sâu sắc",
-              desc: "Không chỉ tin tức表面, mà còn phân tích chuyên sâu và góc nhìn đa chiều.",
+              desc: "Không chỉ tin tức bề mặt, mà còn phân tích chuyên sâu và góc nhìn đa chiều.",
             },
           ].map((value) => (
             <div
