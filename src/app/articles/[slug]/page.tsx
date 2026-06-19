@@ -7,6 +7,7 @@ import { SITE_URL } from "@/lib/constants";
 import { ArticleCard } from "@/components/ArticleCard";
 import { PortableText } from "@/components/PortableText";
 import { ReadingProgress } from "@/components/ReadingProgress";
+import { preprocessBlocks } from "@/lib/sanitize";
 import type { Article } from "@/types";
 
 export const revalidate = 60;
@@ -235,7 +236,7 @@ export default async function ArticlePage({ params }: PageProps) {
           {/* Body Content */}
           <div className="article-body max-w-[720px]">
             {article.body && article.body.length > 0 ? (
-              <PortableText value={article.body} />
+              <PortableText value={preprocessBlocks(article.body)} />
             ) : (
               <p className="text-[var(--text-secondary)]">
                 Nội dung bài viết đang được cập nhật. Vui lòng quay lại sau.

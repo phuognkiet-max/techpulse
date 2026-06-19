@@ -4,91 +4,6 @@ import { PortableText as PortableTextReact } from "@portabletext/react";
 import Link from "next/link";
 import React from "react";
 
-/**
- * Parse inline markdown (**bold**, `code`) into React nodes.
- */
-function parseInlineMarkdown(text: string): React.ReactNode[] {
-  if (!text || (!text.includes("**") && !text.includes("`"))) {
-    return [text];
-  }
-
-  const regex = /(\*\*[^*]+\*\*|`[^`]+`)/g;
-  const parts = text.split(regex);
-
-  return parts
-    .filter((p) => p.length > 0)
-    .map((part, i) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
-        return React.createElement("strong", { key: i, className: "font-bold" }, part.slice(2, -2));
-      }
-      if (part.startsWith("`") && part.endsWith("`")) {
-        return React.createElement("code", {
-          key: i,
-          className: "bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent)] font-mono",
-        }, part.slice(1, -1));
-      }
-      return React.createElement(React.Fragment, { key: i }, part);
-    });
-}
-
-/**
- * Pre-process blocks: parse **bold** and `code` in span text into proper marks.
- * Runs client-side to avoid RSC serialization issues.
- */
-function preprocessBlocks(blocks: any[]): any[] {
-  if (!blocks) return blocks;
-
-  return blocks.map((block) => {
-    if (block._type !== "block" || !block.children) return block;
-
-    const newChildren: any[] = [];
-
-    for (const child of block.children) {
-      if (child._type !== "span" || !child.text) {
-        newChildren.push(child);
-        continue;
-      }
-
-      const text = child.text;
-      if (!text.includes("**") && !text.includes("`")) {
-        newChildren.push(child);
-        continue;
-      }
-
-      const regex = /(\*\*[^*]+\*\*|`[^`]+`)/g;
-      const parts = text.split(regex);
-
-      for (const part of parts) {
-        if (!part) continue;
-        if (part.startsWith("**") && part.endsWith("**")) {
-          newChildren.push({
-            _type: "span",
-            _key: Math.random().toString(36).slice(2),
-            text: part.slice(2, -2),
-            marks: [...(child.marks || []), "strong"],
-          });
-        } else if (part.startsWith("`") && part.endsWith("`")) {
-          newChildren.push({
-            _type: "span",
-            _key: Math.random().toString(36).slice(2),
-            text: part.slice(1, -1),
-            marks: [...(child.marks || []), "code"],
-          });
-        } else {
-          newChildren.push({
-            _type: "span",
-            _key: Math.random().toString(36).slice(2),
-            text: part,
-            marks: child.marks || [],
-          });
-        }
-      }
-    }
-
-    return { ...block, children: newChildren };
-  });
-}
-
 const components = {
   types: {
     image: ({ value }: { value?: { asset?: { url: string }; alt?: string } }) => {
@@ -159,11 +74,13 @@ interface PortableTextProps {
   value: any[];
 }
 
+/**
+ * PortableText renderer.
+ * NOTE: Blocks should be preprocessed server-side with preprocessBlocks()
+ * before passing to this component, to convert raw **markdown** spans
+ * into proper Portable Text marks.
+ */
 export function PortableText({ value }: PortableTextProps) {
   if (!value || value.length === 0) return null;
-
-  // Pre-process to convert raw **markdown** spans into proper marks
-  const processed = React.useMemo(() => preprocessBlocks(value), [value]);
-
-  return <PortableTextReact components={components} value={processed} />;
+  return <PortableTextReact components={components} value={value} />;
 }
