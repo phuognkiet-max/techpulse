@@ -2,12 +2,20 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Article } from "@/types";
 
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("vi-VN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+/** Safe date formatter — never returns "Invalid Date" */
+function formatDate(dateString?: string | null): string {
+  if (!dateString) return "";
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch {
+    return "";
+  }
 }
 
 function getCategoryStyle(color?: string) {
@@ -18,18 +26,6 @@ function getCategoryStyle(color?: string) {
     orange: "bg-[var(--cat-startup)]",
     red: "bg-[var(--cat-hardware)]",
     cyan: "bg-[var(--cat-mobile)]",
-  };
-  return styles[color || "blue"] || styles.blue;
-}
-
-function getCategoryTextColor(color?: string) {
-  const styles: Record<string, string> = {
-    blue: "text-[var(--cat-ai)]",
-    purple: "text-[var(--cat-ai)]",
-    green: "text-[var(--cat-software)]",
-    orange: "text-[var(--cat-startup)]",
-    red: "text-[var(--cat-hardware)]",
-    cyan: "text-[var(--cat-mobile)]",
   };
   return styles[color || "blue"] || styles.blue;
 }
@@ -80,6 +76,7 @@ interface ArticleCardProps {
 
 export function ArticleCard({ article, variant = "default" }: ArticleCardProps) {
   const coverSrc = getCoverSrc(article);
+  const dateStr = formatDate(article.publishedAt);
 
   if (variant === "featured") {
     return (
@@ -114,8 +111,12 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
             </p>
             <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] tracking-wide">
               <span className="font-medium text-[var(--text-secondary)]">{article.author?.name}</span>
-              <span>·</span>
-              <time>{formatDate(article.publishedAt)}</time>
+              {dateStr && (
+                <>
+                  <span>·</span>
+                  <time>{dateStr}</time>
+                </>
+              )}
               {article.readingTime && (
                 <>
                   <span>·</span>
@@ -133,7 +134,8 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
     return (
       <Link href={`/articles/${article.slug.current}`}>
         <article className="group flex gap-4 py-4 border-b border-[var(--border-light)] last:border-0 hover:bg-[var(--bg-secondary)] -mx-2 px-2 rounded-xl transition-all">
-          <div className="h-[72px] w-[72px] flex-shrink-0 rounded-xl overflow-hidden bg-[var(--bg-tertiary)]">
+          {/* Fixed-size thumbnail — no distortion */}
+          <div className="h-16 w-16 flex-shrink-0 rounded-xl overflow-hidden bg-[var(--bg-tertiary)]">
             {coverSrc ? (
               <CoverImage src={coverSrc} alt={article.title} className="w-full h-full" />
             ) : (
@@ -148,18 +150,20 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
             <h3 className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors line-clamp-2 leading-snug tracking-tight">
               {article.title}
             </h3>
-            <div className="mt-1.5 flex items-center gap-2 text-xs text-[var(--text-muted)] tracking-wide">
-              <span>{article.author?.name}</span>
-              <span>·</span>
-              <time>{formatDate(article.publishedAt)}</time>
-            </div>
+            {dateStr && (
+              <div className="mt-1.5 flex items-center gap-2 text-xs text-[var(--text-muted)] tracking-wide">
+                <span>{article.author?.name}</span>
+                <span>·</span>
+                <time>{dateStr}</time>
+              </div>
+            )}
           </div>
         </article>
       </Link>
     );
   }
 
-  // Default variant — premium card
+  // Default variant
   return (
     <Link href={`/articles/${article.slug.current}`}>
       <article className="card-premium group overflow-hidden">
@@ -192,7 +196,7 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
           </p>
           <div className="flex items-center justify-between text-xs text-[var(--text-muted)] tracking-wide">
             <span className="font-medium text-[var(--text-secondary)]">{article.author?.name}</span>
-            <time>{formatDate(article.publishedAt)}</time>
+            {dateStr && <time>{dateStr}</time>}
           </div>
         </div>
       </article>

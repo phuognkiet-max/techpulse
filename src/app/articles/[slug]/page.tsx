@@ -11,12 +11,20 @@ import type { Article } from "@/types";
 
 export const revalidate = 60;
 
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("vi-VN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+/** Safe date formatter — never returns "Invalid Date" */
+function formatDate(dateString?: string | null): string {
+  if (!dateString) return "";
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch {
+    return "";
+  }
 }
 
 function getCategoryBg(color?: string) {
@@ -183,10 +191,10 @@ export default async function ArticlePage({ params }: PageProps) {
                 {article.author?.name}
               </p>
               <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] tracking-wide">
-                <time>{formatDate(article.publishedAt)}</time>
+                {formatDate(article.publishedAt) && <time>{formatDate(article.publishedAt)}</time>}
                 {article.readingTime && (
                   <>
-                    <span>·</span>
+                    {formatDate(article.publishedAt) && <span>·</span>}
                     <span>{article.readingTime} phút đọc</span>
                   </>
                 )}

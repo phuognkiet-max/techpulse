@@ -76,7 +76,7 @@ export default async function HomePage() {
                     <div className="flex items-center gap-2 text-sm text-[var(--text-muted)] tracking-wide">
                       <span className="font-medium text-[var(--text-secondary)]">{heroArticle.author?.name}</span>
                       <span>·</span>
-                      <time>{new Date(heroArticle.publishedAt).toLocaleDateString("vi-VN")}</time>
+                      <time>{new Date(heroArticle.publishedAt || Date.now()).toLocaleDateString("vi-VN")}</time>
                       {heroArticle.readingTime && (
                         <>
                           <span>·</span>
@@ -118,7 +118,7 @@ export default async function HomePage() {
                         {article.title}
                       </h3>
                       <div className="mt-2 text-xs text-[var(--text-muted)] tracking-wide">
-                        {new Date(article.publishedAt).toLocaleDateString("vi-VN")}
+                        {new Date(article.publishedAt || Date.now()).toLocaleDateString("vi-VN")}
                       </div>
                     </div>
                   </article>
@@ -192,7 +192,7 @@ export default async function HomePage() {
                           {article.category?.title}
                         </span>
                         <span>·</span>
-                        <time>{new Date(article.publishedAt).toLocaleDateString("vi-VN")}</time>
+                        <time>{new Date(article.publishedAt || Date.now()).toLocaleDateString("vi-VN")}</time>
                       </div>
                     </div>
                   </div>
