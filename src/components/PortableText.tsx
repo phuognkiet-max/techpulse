@@ -2,6 +2,74 @@
 
 import { PortableText as PortableTextReact } from "@portabletext/react";
 import Link from "next/link";
+import React from "react";
+
+/** Parse markdown **bold** and `code` inside a text string */
+function parseInlineMarkdown(text: string): React.ReactNode[] {
+  if (!text) return [];
+
+  // Split by **bold** and `code` patterns
+  const regex = /(\*\*.*?\*\*|`[^`]+`)/g;
+  const parts = text.split(regex);
+
+  return parts
+    .filter((p) => p.length > 0)
+    .map((part, i) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <strong key={i} className="font-bold">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      if (part.startsWith("`") && part.endsWith("`")) {
+        return (
+          <code
+            key={i}
+            className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent)] font-[var(--font-mono)]"
+          >
+            {part.slice(1, -1)}
+          </code>
+        );
+      }
+      return <React.Fragment key={i}>{part}</React.Fragment>;
+    });
+}
+
+/** Custom span renderer that handles markdown bold/code */
+function RichSpan({ children }: { children?: React.ReactNode }) {
+  if (!children) return <>{children}</>;
+
+  // If children is a single text node with markdown, parse it
+  if (typeof children === "string") {
+    return <>{parseInlineMarkdown(children)}</>;
+  }
+
+  // If children is an array, check each element
+  if (Array.isArray(children)) {
+    const hasMarkdown = children.some(
+      (child) =>
+        typeof child === "string" &&
+        (child.includes("**") || child.includes("`"))
+    );
+
+    if (hasMarkdown) {
+      const result: React.ReactNode[] = [];
+      children.forEach((child, i) => {
+        if (typeof child === "string" && (child.includes("**") || child.includes("`"))) {
+          result.push(...parseInlineMarkdown(child).map((node, j) =>
+            React.cloneElement(node as React.ReactElement, { key: `${i}-${j}` })
+          ));
+        } else {
+          result.push(<React.Fragment key={i}>{child}</React.Fragment>);
+        }
+      });
+      return <>{result}</>;
+    }
+  }
+
+  return <>{children}</>;
+}
 
 // Custom components for Portable Text
 const components = {
@@ -61,7 +129,7 @@ const components = {
       <em className="italic">{children}</em>
     ),
     code: ({ children }: { children?: React.ReactNode }) => (
-      <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent)] font-mono">
+      <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent)] font-[var(--font-mono)]">
         {children}
       </code>
     ),
@@ -92,6 +160,8 @@ const components = {
       );
     },
   },
+  // Wrap each span in our RichSpan to parse inline markdown
+  span: RichSpan,
 };
 
 interface PortableTextProps {
