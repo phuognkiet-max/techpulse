@@ -132,13 +132,6 @@ const components = {
       );
     },
   },
-  // Custom renderer for text nodes — this intercepts ALL text in spans
-  // @portabletext/react calls this for each text node
-  ...(function() {
-    // Patch: Override the default text renderer to parse markdown
-    const originalText = components;
-    return {};
-  })(),
 };
 
 interface PortableTextProps {
