@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Logo } from "./Logo";
 
 const navLinks = [
@@ -20,15 +20,25 @@ interface HeaderProps {
 export function Header({ siteTitle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-[var(--border)]">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "glass-header shadow-[var(--shadow-sm)]"
+          : "bg-white/90 backdrop-blur-sm border-b border-[var(--border)]"
+      }`}
+    >
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        {/* Top bar — breaking news ticker style */}
-        <div className="flex items-center justify-between h-[1px] hidden" />
-
         {/* Main header */}
-        <div className="flex h-14 items-center justify-between">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <Logo size="md" />
@@ -40,7 +50,7 @@ export function Header({ siteTitle }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-1.5 text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] rounded-md transition-all duration-200"
+                className="px-3.5 py-2 text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] rounded-lg transition-all duration-200 tracking-wide"
               >
                 {link.label}
               </Link>
@@ -49,10 +59,9 @@ export function Header({ siteTitle }: HeaderProps) {
 
           {/* Actions */}
           <div className="flex items-center gap-1">
-            {/* Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-all"
+              className="p-2.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-all"
               aria-label="Tìm kiếm"
             >
               <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -60,10 +69,9 @@ export function Header({ siteTitle }: HeaderProps) {
               </svg>
             </button>
 
-            {/* Mobile Menu */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-all"
+              className="md:hidden p-2.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-all"
               aria-label="Menu"
             >
               <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -79,17 +87,17 @@ export function Header({ siteTitle }: HeaderProps) {
 
         {/* Search Bar */}
         {searchOpen && (
-          <div className="pb-3 animate-fade-in-up">
+          <div className="pb-4 animate-fade-in-up">
             <form action="/search" method="GET">
               <div className="relative">
-                <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
                   type="text"
                   name="q"
                   placeholder="Tìm kiếm bài viết..."
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20 transition-all"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] py-3 pl-11 pr-4 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10 transition-all"
                   autoFocus
                 />
               </div>
@@ -99,14 +107,14 @@ export function Header({ siteTitle }: HeaderProps) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden pb-3 animate-fade-in-up border-t border-[var(--border-light)]">
-            <nav className="flex flex-col gap-0.5 pt-2">
+          <div className="md:hidden pb-4 animate-fade-in-up border-t border-[var(--border-light)]">
+            <nav className="flex flex-col gap-0.5 pt-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] rounded-lg transition-all"
+                  className="px-3.5 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] rounded-lg transition-all tracking-wide"
                 >
                   {link.label}
                 </Link>

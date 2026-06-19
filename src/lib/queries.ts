@@ -126,6 +126,18 @@ export const RELATED_ARTICLES = `*[_type == "article" && _id != $id && category.
   "author": author->{ name }
 }`;
 
+export const RELATED_BY_TAGS = `*[_type == "article" && _id != $id && count(tags[] match $tags) > 0] | order(publishedAt desc)[0...4] {
+  _id,
+  title,
+  slug,
+  excerpt,
+  coverImage,
+  coverImageUrl,
+  tags,
+  "category": category->{ title, slug, color },
+  "author": author->{ name }
+}`;
+
 export const SEARCH_ARTICLES = `*[_type == "article" && (title match $query || excerpt match $query || tags[] match $query)] | order(publishedAt desc) {
   _id,
   title,
