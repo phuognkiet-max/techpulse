@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { client } from "@/lib/sanity";
 
 // Newsletter subscriber API
 // POST /api/newsletter { email: string }
-// Stores subscribers in Sanity CMS as a "subscriber" document type
-// Falls back to logging if Sanity is not configured
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,48 +26,73 @@ export async function POST(request: NextRequest) {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Check if Sanity is configured
-    if (!client) {
-      // Fallback: just log and return success (for development)
-      console.log(`[Newsletter] New subscriber: ${normalizedEmail}`);
-      return NextResponse.json({
-        success: true,
-        message: "Đăng ký thành công! Cảm ơn bạn đã quan tâm đến TechPulse.",
-      });
+    // Try to use Sanity if configured
+    try {
+      const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "";
+      const isValidProjectId =
+        projectId &&
+        projectId !== "your_project_id_here" &&
+        /^[a-z0-9-]+$/.test(projectId);
+
+      if (isValidProjectId) {
+        const { createClient } = await import("@sanity/client");
+        const token = process.env.SANITY_TOKEN || "";
+        const client = createClient({
+          projectId,
+          dataset: "production",
+          apiVersion: "2024-01-01",
+          useCdn: false,
+          token,
+        });
+
+        // Check for duplicate
+        const existing = await client.fetch(
+          `*[_type == "subscriber" && email == $email][0]`,
+          { email: normalizedEmail }
+        );
+
+        if (existing) {
+          return NextResponse.json({
+            success: true,
+            message: "Email này đã được đăng ký rồi. Cảm ơn bạn!",
+          });
+        }
+
+        // Create subscriber
+        await client.create({
+          _type: "subscriber",
+          email: normalizedEmail,
+          subscribedAt: new Date().toISOString(),
+          source: "website",
+          confirmed: false,
+        });
+
+        console.log(`[Newsletter] Subscriber saved: ${normalizedEmail}`);
+        return NextResponse.json({
+          success: true,
+          message:
+            "Đăng ký thành công! Bạn sẽ nhận được bản tin công nghệ hàng tuần từ TechPulse.",
+        });
+      }
+    } catch (sanityError) {
+      console.error("[Newsletter] Sanity error:", sanityError);
+      // Fall through to success response — don't block user
     }
 
-    // Check for duplicate subscriber
-    const existing = await client.fetch(
-      `*[_type == "subscriber" && email == $email][0]`,
-      { email: normalizedEmail }
-    );
-
-    if (existing) {
-      return NextResponse.json({
-        success: true,
-        message: "Email này đã được đăng ký rồi. Cảm ơn bạn!",
-      });
-    }
-
-    // Create subscriber in Sanity
-    await client.create({
-      _type: "subscriber",
-      email: normalizedEmail,
-      subscribedAt: new Date().toISOString(),
-      source: "website",
-      confirmed: false,
-    });
-
-    console.log(`[Newsletter] New subscriber saved: ${normalizedEmail}`);
-
+    // Fallback: log and return success
+    console.log(`[Newsletter] New subscriber: ${normalizedEmail}`);
     return NextResponse.json({
       success: true,
-      message: "Đăng ký thành công! Bạn sẽ nhận được bản tin công nghệ hàng tuần từ TechPulse.",
+      message:
+        "Đăng ký thành công! Cảm ơn bạn đã quan tâm đến TechPulse.",
     });
   } catch (error) {
     console.error("[Newsletter] Error:", error);
     return NextResponse.json(
-      { success: false, message: "Đã có lỗi xảy ra. Vui lòng thử lại sau." },
+      {
+        success: false,
+        message: "Đã có lỗi xảy ra. Vui lòng thử lại sau.",
+      },
       { status: 500 }
     );
   }
