@@ -6,6 +6,7 @@ import { ARTICLE_BY_SLUG, RELATED_ARTICLES } from "@/lib/queries";
 import { SITE_URL } from "@/lib/constants";
 import { ArticleCard } from "@/components/ArticleCard";
 import { PortableText } from "@/components/PortableText";
+import { ReadingProgress } from "@/components/ReadingProgress";
 import type { Article } from "@/types";
 
 export const revalidate = 60;
@@ -94,6 +95,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
   return (
     <>
+      <ReadingProgress />
       {/* JSON-LD Structured Data for SEO */}
       <script
         type="application/ld+json"

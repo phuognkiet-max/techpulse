@@ -3,31 +3,39 @@
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif: 'Georgia', 'Cambria', 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 }
 
 :root {
-  /* Light professional palette */
+  /* ─── Design System: 60-30-10 Rule ─── */
+  /* 60% Background */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #f0f2f5;
-  --text-primary: #1a1a2e;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --accent: #e63946;
-  --accent-hover: #c1121f;
-  --accent-light: #fef2f2;
-  --border: #e5e7eb;
-  --border-light: #f3f4f6;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+  --bg-secondary: #f8fafc;        /* slate-50 */
+  --bg-tertiary: #f1f5f9;         /* slate-100 */
 
-  /* Category colors — muted, professional */
-  --cat-ai: #6366f1;
-  --cat-mobile: #0891b2;
-  --cat-startup: #d97706;
-  --cat-software: #059669;
-  --cat-hardware: #dc2626;
+  /* 30% Structure & Text */
+  --text-primary: #0f172a;        /* slate-900 */
+  --text-secondary: #475569;      /* slate-600 */
+  --text-muted: #94a3b8;          /* slate-400 */
+
+  /* 10% Accent */
+  --accent: #14b8a6;              /* teal-500 */
+  --accent-hover: #0d9488;        /* teal-600 */
+  --accent-light: #f0fdfa;        /* teal-50 */
+
+  /* Borders & Shadows */
+  --border: #e2e8f0;              /* slate-200 */
+  --border-light: #f1f5f9;        /* slate-100 */
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15,23,42,0.08), 0 4px 6px -4px rgba(15,23,42,0.03);
+
+  /* Category colors */
+  --cat-ai: #6366f1;              /* indigo-500 */
+  --cat-mobile: #0891b2;          /* cyan-600 */
+  --cat-startup: #d97706;         /* amber-500 */
+  --cat-software: #059669;        /* emerald-600 */
+  --cat-hardware: #dc2626;        /* red-600 */
 }
 
 * {
@@ -42,46 +50,56 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
 }
 
 /* Selection color */
 ::selection {
-  background: rgba(230, 57, 70, 0.15);
+  background: rgba(20, 184, 166, 0.15);
   color: var(--text-primary);
 }
 
-/* Article body typography — clean, readable */
+/* ─── Typography Scale ─── */
+/* H1: 40px / 2.5rem — font-bold, tracking-tight */
+/* H2: 28px / 1.75rem — font-semibold */
+/* H3: 20px / 1.25rem — font-semibold */
+/* Body: 16px / 1rem — leading-relaxed (1.6-1.8) */
+/* Small: 14px / 0.875rem */
+
+/* Article body typography — clean, readable (F-pattern optimized) */
 .article-body h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.75rem;        /* 28px */
+  font-weight: 600;
   margin-top: 2.5rem;
   margin-bottom: 1rem;
   color: var(--text-primary);
   letter-spacing: -0.01em;
+  line-height: 1.3;
 }
 
 .article-body h3 {
-  font-size: 1.25rem;
+  font-size: 1.25rem;        /* 20px */
   font-weight: 600;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   color: var(--text-primary);
+  line-height: 1.4;
 }
 
 .article-body p {
   margin-bottom: 1.5rem;
-  line-height: 1.8;
-  color: #374151;
-  font-size: 1.0625rem;
+  line-height: 1.75;         /* Relaxed for readability */
+  color: #334155;            /* slate-700 */
+  font-size: 1rem;           /* 16px base */
 }
 
 .article-body ul, .article-body ol {
   margin-bottom: 1.5rem;
   padding-left: 1.5rem;
-  color: #374151;
+  color: #334155;
 }
 
 .article-body li {
@@ -104,6 +122,7 @@ body {
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
+  transition: color 0.15s, text-decoration-thickness 0.15s;
 }
 
 .article-body a:hover {
@@ -117,11 +136,12 @@ body {
   border-radius: 4px;
   font-size: 0.875em;
   color: var(--accent);
+  font-family: var(--font-mono);
 }
 
 .article-body pre {
-  background: #1a1a2e;
-  color: #e5e7eb;
+  background: #0f172a;       /* slate-900 */
+  color: #e2e8f0;
   padding: 1.25rem;
   border-radius: 10px;
   overflow-x: auto;
@@ -140,6 +160,48 @@ body {
   box-shadow: var(--shadow-md);
 }
 
+/* ─── Reading Progress Bar ─── */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* ─── Toast Notification ─── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(120%);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-success {
+  background: #059669;
+  color: white;
+}
+
+.toast-error {
+  background: #dc2626;
+  color: white;
+}
+
 /* Clean scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -150,12 +212,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #94a3b8;
 }
 
 /* Subtle entrance animation */
@@ -198,4 +260,13 @@ body {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+/* Scrollbar hide for horizontal scroll */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

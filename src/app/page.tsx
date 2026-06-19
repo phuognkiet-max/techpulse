@@ -43,16 +43,15 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* ─── Hero Section ─── */}
+      {/* ─── Hero Section: Magazine Grid ─── */}
       {heroArticle && (
         <section className="py-8 md:py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main hero */}
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Main hero — large cover image */}
+            <div>
               <Link href={`/articles/${heroArticle.slug.current}`}>
                 <article className="group relative overflow-hidden rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-lg)] transition-all duration-300">
-                  <div className="relative h-72 md:h-80 bg-[var(--bg-tertiary)] overflow-hidden">
-                    {/* Cover image */}
+                  <div className="relative h-72 md:h-[420px] bg-[var(--bg-tertiary)] overflow-hidden">
                     {(heroArticle.coverImageUrl || heroArticle.coverImage) && (
                       <img
                         src={heroArticle.coverImageUrl || heroArticle.coverImage}
@@ -60,37 +59,39 @@ export default async function HomePage() {
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
-                    <div className="absolute top-4 left-4 z-20">
-                      <span className="inline-flex items-center rounded-md bg-[var(--accent)] px-2.5 py-1 text-xs font-semibold text-white">
-                        {heroArticle.category?.title}
-                      </span>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-                      <h1 className="text-2xl md:text-3xl font-bold text-white leading-snug mb-2 group-hover:text-white/90 transition-colors">
-                        {heroArticle.title}
-                      </h1>
-                      <p className="text-sm text-white/80 line-clamp-2 mb-3 hidden sm:block">
-                        {heroArticle.excerpt}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-white/70">
-                        <span className="font-medium text-white/90">{heroArticle.author?.name}</span>
-                        <span>·</span>
-                        <time>{new Date(heroArticle.publishedAt).toLocaleDateString("vi-VN")}</time>
-                      </div>
+                  </div>
+                  <div className="p-6">
+                    <span className="inline-flex items-center rounded-md bg-[var(--accent)] px-2.5 py-1 text-xs font-semibold text-white mb-3">
+                      {heroArticle.category?.title}
+                    </span>
+                    <h1 className="text-[2rem] md:text-[2.5rem] font-bold text-[var(--text-primary)] leading-tight tracking-tight mb-3 group-hover:text-[var(--accent)] transition-colors">
+                      {heroArticle.title}
+                    </h1>
+                    <p className="text-base text-[var(--text-secondary)] line-clamp-2 mb-4 leading-relaxed">
+                      {heroArticle.excerpt}
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+                      <span className="font-medium text-[var(--text-secondary)]">{heroArticle.author?.name}</span>
+                      <span>·</span>
+                      <time>{new Date(heroArticle.publishedAt).toLocaleDateString("vi-VN")}</time>
+                      {heroArticle.readingTime && (
+                        <>
+                          <span>·</span>
+                          <span>{heroArticle.readingTime} phút đọc</span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </article>
               </Link>
             </div>
 
-            {/* Side stories */}
+            {/* Side stories — 2-3 smaller cards */}
             <div className="flex flex-col gap-4">
               {sideArticles.map((article) => (
                 <Link key={article._id} href={`/articles/${article.slug.current}`}>
-                  <article className="group flex gap-3 p-3 rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-md)] transition-all duration-200 overflow-hidden">
-                    {/* Side article thumbnail */}
-                    <div className="h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-[var(--bg-tertiary)]">
+                  <article className="group flex gap-4 p-4 rounded-xl border border-[var(--border)] bg-white hover:shadow-[var(--shadow-md)] transition-all duration-200 overflow-hidden">
+                    <div className="h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-[var(--bg-tertiary)]">
                       {(article.coverImageUrl || article.coverImage) ? (
                         <img
                           src={article.coverImageUrl || article.coverImage}
