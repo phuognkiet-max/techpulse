@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { client } from "@/lib/sanity";
-import { ALL_ARTICLES, FEATURED_ARTICLES, ALL_CATEGORIES } from "@/lib/queries";
-import { ArticleCard } from "@/components/ArticleCard";
+import { ALL_ARTICLES, FEATURED_ARTICLES, ALL_CATEGORIES, DEEP_ANALYSIS } from "@/lib/queries";
+import { formatDateVI, readingTimeLabel } from "@/lib/dates";
+import { ArticleCard, getCategoryTextColor } from "@/components/ArticleCard";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import type { Article, Category } from "@/types";
 
@@ -9,26 +10,27 @@ export const revalidate = 60;
 
 async function getData() {
   if (!client) {
-    return { allArticles: [], featuredArticles: [], categories: [] };
+    return { allArticles: [], featuredArticles: [], categories: [], deepAnalysis: [] };
   }
 
   try {
-    const [allArticles, featuredArticles, categories] = await Promise.all([
+    const [allArticles, featuredArticles, categories, deepAnalysis] = await Promise.all([
       client.fetch<Article[]>(ALL_ARTICLES),
       client.fetch<Article[]>(FEATURED_ARTICLES),
       client.fetch<Category[]>(ALL_CATEGORIES),
+      client.fetch<Article[]>(DEEP_ANALYSIS),
     ]);
-    return { allArticles, featuredArticles, categories };
+    return { allArticles, featuredArticles, categories, deepAnalysis };
   } catch {
-    return { allArticles: [], featuredArticles: [], categories: [] };
+    return { allArticles: [], featuredArticles: [], categories: [], deepAnalysis: [] };
   }
 }
 
 export default async function HomePage() {
-  const { allArticles, featuredArticles, categories } = await getData();
+  const { allArticles, featuredArticles, categories, deepAnalysis } = await getData();
 
   const heroArticle = featuredArticles[0] || allArticles[0];
-  const sideArticles = (featuredArticles.length > 1 ? featuredArticles.slice(1, 4) : allArticles.slice(1, 4));
+  const sideArticles = featuredArticles.length > 1 ? featuredArticles.slice(1, 4) : allArticles.slice(1, 4);
   const latestArticles = allArticles.slice(0, 6);
   const trendingArticles = allArticles.slice(0, 5);
 
@@ -44,11 +46,10 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* ─── Hero Section: Magazine Grid ─── */}
+      {/* ─── Hero Section ─── */}
       {heroArticle && (
         <section className="py-10 md:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Main hero */}
             <div>
               <Link href={`/articles/${heroArticle.slug.current}`}>
                 <article className="card-premium group overflow-hidden">
@@ -77,11 +78,11 @@ export default async function HomePage() {
                     <div className="flex items-center gap-2 text-sm text-[var(--text-muted)] tracking-wide">
                       <span className="font-medium text-[var(--text-secondary)]">{heroArticle.author?.name}</span>
                       <span>·</span>
-                      <time>{new Date(heroArticle.publishedAt || Date.now()).toLocaleDateString("vi-VN")}</time>
+                      <time>{formatDateVI(heroArticle.publishedAt)}</time>
                       {heroArticle.readingTime && (
                         <>
                           <span>·</span>
-                          <span>{heroArticle.readingTime} phút đọc</span>
+                          <span>{readingTimeLabel(heroArticle.readingTime)}</span>
                         </>
                       )}
                     </div>
@@ -119,7 +120,7 @@ export default async function HomePage() {
                         {article.title}
                       </h3>
                       <div className="mt-2 text-xs text-[var(--text-muted)] tracking-wide">
-                        {new Date(article.publishedAt || Date.now()).toLocaleDateString("vi-VN")}
+                        {formatDateVI(article.publishedAt)}
                       </div>
                     </div>
                   </article>
@@ -152,9 +153,7 @@ export default async function HomePage() {
       {latestArticles.length > 0 && (
         <section className="mb-16 section-spacing">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
-              Bài viết mới nhất
-            </h2>
+            <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Bài viết mới nhất</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
             {latestArticles.map((article) => (
@@ -164,15 +163,29 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ─── Deep Analysis ─── */}
+      {deepAnalysis.length > 0 && (
+        <section className="mb-16 section-spacing">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Phân tích chuyên sâu</h2>
+            <Link href="/categories/ai-machine-learning" className="text-sm font-medium text-[var(--accent)] hover:underline">
+              Xem thêm &rarr;
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+            {deepAnalysis.map((article) => (
+              <ArticleCard key={article._id} article={article} variant="featured" />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ─── Trending + Newsletter ─── */}
       {trendingArticles.length > 0 && (
         <section className="mb-16 section-spacing">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Main content */}
             <div className="lg:col-span-2">
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6 tracking-tight">
-                Đang xu hướng
-              </h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6 tracking-tight">Đang xu hướng</h2>
               <div>
                 {trendingArticles.map((article, i) => (
                   <div key={article._id} className="flex gap-5 py-4 border-b border-[var(--border-light)] last:border-0">
@@ -193,7 +206,7 @@ export default async function HomePage() {
                           {article.category?.title}
                         </span>
                         <span>·</span>
-                        <time>{new Date(article.publishedAt || Date.now()).toLocaleDateString("vi-VN")}</time>
+                        <time>{formatDateVI(article.publishedAt)}</time>
                       </div>
                     </div>
                   </div>
@@ -201,18 +214,15 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Newsletter sidebar */}
             <div>
               <div className="rounded-2xl border border-[var(--border)] bg-white p-6 sticky top-24 shadow-[var(--shadow-sm)]">
                 <div className="flex items-center gap-2.5 mb-3">
                   <div className="h-9 w-9 rounded-xl bg-[var(--accent)] flex items-center justify-center shadow-sm">
-                    <svg className="w-4.5 h-4.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                     </svg>
                   </div>
-                  <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
-                    Đăng ký nhận tin
-                  </h3>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">Đăng ký nhận tin</h3>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed tracking-wide">
                   Tin tức công nghệ mới nhất mỗi tuần. Không spam, chỉ nội dung chất lượng.
@@ -223,18 +233,16 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ─── Corrections Policy Banner ─── */}
+      <section className="mb-16">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-6 text-center">
+          <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">Chính sách Sửa lỗi</h3>
+          <p className="text-xs text-[var(--text-secondary)] max-w-xl mx-auto leading-relaxed">
+            TechPulse cam kết chính xác. Nếu bạn phát hiện lỗi fact, vui lòng liên hệ. Mọi sửa lỗi sẽ được ghi nhận minh bạch trong bài viết.
+          </p>
+        </div>
+      </section>
     </div>
   );
-}
-
-function getCategoryTextColor(color?: string) {
-  const styles: Record<string, string> = {
-    blue: "text-[var(--cat-ai)]",
-    purple: "text-[var(--cat-ai)]",
-    green: "text-[var(--cat-software)]",
-    orange: "text-[var(--cat-startup)]",
-    red: "text-[var(--cat-hardware)]",
-    cyan: "text-[var(--cat-mobile)]",
-  };
-  return styles[color || "blue"] || styles.blue;
 }

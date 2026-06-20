@@ -1,5 +1,5 @@
 // ============================================
-// TechNews — Type Definitions
+// TechPulse — Type Definitions
 // ============================================
 
 export interface Author {
@@ -8,6 +8,7 @@ export interface Author {
   slug: { current: string };
   image?: string;
   bio?: string;
+  role?: string;
   social?: {
     twitter?: string;
     github?: string;
@@ -24,20 +25,29 @@ export interface Category {
   icon?: string;
 }
 
+export interface ArticleSource {
+  title: string;
+  url: string;
+}
+
 export interface Article {
   _id: string;
   title: string;
   slug: { current: string };
   excerpt: string;
-  body: any[]; // Sanity portable text
+  body: any[];
   publishedAt: string;
+  updatedAt?: string;
   featured?: boolean;
   coverImage?: string;
+  coverImageUrl?: string;
   author: Author;
   category: Category;
   tags?: string[];
   readingTime?: number;
-  coverImageUrl?: string;
+  keyTakeaways?: string[];
+  sources?: ArticleSource[];
+  factCheckStatus?: "verified" | "unverified" | "disputed";
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
