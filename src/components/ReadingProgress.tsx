@@ -18,17 +18,12 @@ export function ReadingProgress() {
     return () => window.removeEventListener("scroll", updateProgress);
   }, []);
 
-  if (progress < 1) return null;
-
   return (
-    <div
-      className="reading-progress"
-      style={{ width: `${progress}%` }}
-      role="progressbar"
-      aria-valuenow={Math.round(progress)}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-label="Tiến độ đọc bài viết"
-    />
+    <div className="fixed top-0 left-0 right-0 z-[60] h-[3px] bg-transparent">
+      <div
+        className="h-full bg-gradient-to-r from-[var(--accent)] to-[#ff6b6b] transition-[width] duration-100 ease-out"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
   );
 }

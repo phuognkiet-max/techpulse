@@ -2,6 +2,7 @@ import Link from "next/link";
 import { client } from "@/lib/sanity";
 import { ALL_ARTICLES, FEATURED_ARTICLES, ALL_CATEGORIES } from "@/lib/queries";
 import { ArticleCard } from "@/components/ArticleCard";
+import { NewsletterForm } from "@/components/NewsletterForm";
 import type { Article, Category } from "@/types";
 
 export const revalidate = 60;
@@ -203,15 +204,20 @@ export default async function HomePage() {
             {/* Newsletter sidebar */}
             <div>
               <div className="rounded-2xl border border-[var(--border)] bg-white p-6 sticky top-24 shadow-[var(--shadow-sm)]">
-                <h3 className="text-base font-bold text-[var(--text-primary)] mb-2 tracking-tight">
-                  Đăng ký nhận tin
-                </h3>
-                <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed tracking-wide">
-                  Tin tức công nghệ mới nhất mỗi tuần qua email.
-                </p>
-                <div className="text-sm text-[var(--text-muted)] italic border border-dashed border-[var(--border)] rounded-xl p-5 text-center tracking-wide">
-                  Tính năng newsletter sẽ sớm ra mắt.
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="h-9 w-9 rounded-xl bg-[var(--accent)] flex items-center justify-center shadow-sm">
+                    <svg className="w-4.5 h-4.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
+                    Đăng ký nhận tin
+                  </h3>
                 </div>
+                <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed tracking-wide">
+                  Tin tức công nghệ mới nhất mỗi tuần. Không spam, chỉ nội dung chất lượng.
+                </p>
+                <NewsletterForm variant="sidebar" />
               </div>
             </div>
           </div>
