@@ -9,11 +9,33 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setStatus("loading");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formState),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setStatus("success");
+        setStatusMessage(data.message);
+        setFormState({ name: "", email: "", subject: "", message: "" });
+      } else {
+        setStatus("error");
+        setStatusMessage(data.message || "Đã có lỗi xảy ra.");
+      }
+    } catch {
+      setStatus("error");
+      setStatusMessage("Không thể kết nối server. Vui lòng thử lại.");
+    }
   };
 
   return (
@@ -53,7 +75,7 @@ export default function ContactPage() {
 
         {/* Contact Form */}
         <div className="md:col-span-2">
-          {submitted ? (
+          {status === "success" ? (
             <div className="rounded-xl border border-[var(--border)] bg-white p-8 text-center">
               <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -64,13 +86,10 @@ export default function ContactPage() {
                 Gửi thành công!
               </h2>
               <p className="text-sm text-[var(--text-secondary)] mb-5">
-                Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi trong vòng 24 giờ.
+                {statusMessage || "Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi trong vòng 24 giờ."}
               </p>
               <button
-                onClick={() => {
-                  setSubmitted(false);
-                  setFormState({ name: "", email: "", subject: "", message: "" });
-                }}
+                onClick={() => setStatus("idle")}
                 className="text-sm text-[var(--accent)] hover:text-[var(--accent-hover)] font-medium transition-colors"
               >
                 Gửi tin nhắn khác
@@ -83,10 +102,11 @@ export default function ContactPage() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                  <label htmlFor="contact-name" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                     Họ tên
                   </label>
                   <input
+                    id="contact-name"
                     type="text"
                     required
                     value={formState.name}
@@ -96,10 +116,11 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                  <label htmlFor="contact-email" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                     Email
                   </label>
                   <input
+                    id="contact-email"
                     type="email"
                     required
                     value={formState.email}
@@ -110,10 +131,11 @@ export default function ContactPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                <label htmlFor="contact-subject" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                   Chủ đề
                 </label>
                 <input
+                  id="contact-subject"
                   type="text"
                   required
                   value={formState.subject}
@@ -123,10 +145,11 @@ export default function ContactPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                <label htmlFor="contact-message" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                   Nội dung
                 </label>
                 <textarea
+                  id="contact-message"
                   required
                   rows={5}
                   value={formState.message}
@@ -135,11 +158,15 @@ export default function ContactPage() {
                   placeholder="Viết tin nhắn của bạn..."
                 />
               </div>
+              {status === "error" && (
+                <p className="text-sm text-red-500">{statusMessage}</p>
+              )}
               <button
                 type="submit"
-                className="w-full rounded-lg bg-[var(--accent)] px-5 py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] transition-colors"
+                disabled={status === "loading"}
+                className="w-full rounded-lg bg-[var(--accent)] px-5 py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Gửi tin nhắn
+                {status === "loading" ? "Đang gửi..." : "Gửi tin nhắn"}
               </button>
             </form>
           )}

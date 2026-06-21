@@ -6,7 +6,7 @@ import type { Article } from "@/types";
 function getCategoryStyle(color?: string) {
   const styles: Record<string, string> = {
     blue: "bg-[var(--cat-ai)]",
-    purple: "bg-[var(--cat-ai)]",
+    purple: "bg-[var(--cat-analysis)]",
     green: "bg-[var(--cat-software)]",
     orange: "bg-[var(--cat-startup)]",
     red: "bg-[var(--cat-hardware)]",
@@ -18,7 +18,7 @@ function getCategoryStyle(color?: string) {
 function getCategoryTextColor(color?: string) {
   const styles: Record<string, string> = {
     blue: "text-[var(--cat-ai)]",
-    purple: "text-[var(--cat-ai)]",
+    purple: "text-[var(--cat-analysis)]",
     green: "text-[var(--cat-software)]",
     orange: "text-[var(--cat-startup)]",
     red: "text-[var(--cat-hardware)]",

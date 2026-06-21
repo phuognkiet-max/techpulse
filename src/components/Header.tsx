@@ -8,9 +8,10 @@ const navLinks = [
   { href: "/", label: "Trang chủ" },
   { href: "/categories/ai-machine-learning", label: "AI" },
   { href: "/categories/mobile", label: "Mobile" },
-  { href: "/categories/startup", label: "Startup" },
   { href: "/categories/software", label: "Software" },
   { href: "/categories/hardware", label: "Hardware" },
+  { href: "/categories/startup", label: "Startup" },
+  { href: "/categories/analysis", label: "Analysis" },
 ];
 
 interface HeaderProps {

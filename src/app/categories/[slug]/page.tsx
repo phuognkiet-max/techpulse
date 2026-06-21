@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps) {
 function getCategoryBg(color?: string) {
   const styles: Record<string, string> = {
     blue: "bg-[var(--cat-ai)]",
-    purple: "bg-[var(--cat-ai)]",
+    purple: "bg-[var(--cat-analysis)]",
     green: "bg-[var(--cat-software)]",
     orange: "bg-[var(--cat-startup)]",
     red: "bg-[var(--cat-hardware)]",

@@ -19,17 +19,24 @@ export function NewsletterForm({ variant = "sidebar" }: NewsletterFormProps) {
     setStatus("loading");
 
     try {
-      const stored = JSON.parse(localStorage.getItem("techpulse_subscribers") || "[]");
-      if (!stored.includes(email)) {
-        stored.push(email);
-        localStorage.setItem("techpulse_subscribers", JSON.stringify(stored));
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setStatus("success");
+        setMessage(data.message || "Đăng ký thành công!");
+        setEmail("");
+      } else {
+        setStatus("error");
+        setMessage(data.message || "Có lỗi xảy ra. Vui lòng thử lại.");
       }
-      setStatus("success");
-      setMessage("Đăng ký thành công! Cảm ơn bạn đã theo dõi TechPulse.");
-      setEmail("");
     } catch {
       setStatus("error");
-      setMessage("Có lỗi xảy ra. Vui lòng thử lại.");
+      setMessage("Không thể kết nối server. Vui lòng thử lại.");
     }
   };
 

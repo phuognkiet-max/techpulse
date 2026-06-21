@@ -175,8 +175,8 @@ export const PREV_NEXT_ARTICLES = `{
   }
 }`;
 
-// Deep analysis articles (longer reading time)
-export const DEEP_ANALYSIS = `*[_type == "article" && readingTime >= 8] | order(publishedAt desc)[0...3] {
+// Deep analysis articles (category-based, not reading time)
+export const DEEP_ANALYSIS = `*[_type == "article" && category->slug.current == "analysis"] | order(publishedAt desc)[0...3] {
   _id,
   title,
   slug,
