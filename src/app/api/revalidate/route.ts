@@ -116,3 +116,4 @@ export async function GET(request: NextRequest) {
     types: ["article", "category", "siteSettings", "all"],
   });
 }
+// force redeploy Mon Jun 22 09:08:19 UTC 2026
