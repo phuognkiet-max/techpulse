@@ -25,6 +25,44 @@ const components = {
         </figure>
       );
     },
+    markdownTable: ({ value }: { value?: { headers?: string[]; rows?: string[][] } }) => {
+      if (!value?.headers || !value.rows) return null;
+      return (
+        <div className="my-6 overflow-x-auto rounded-xl border border-[var(--border)] shadow-sm">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[var(--bg-tertiary)]">
+                {value.headers.map((header: string, i: number) => (
+                  <th
+                    key={i}
+                    className="px-4 py-3 text-left font-semibold text-[var(--text-primary)] border-b border-[var(--border)] whitespace-nowrap"
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {value.rows.map((row: string[], rowIdx: number) => (
+                <tr
+                  key={rowIdx}
+                  className={rowIdx % 2 === 0 ? "bg-white" : "bg-[var(--bg-secondary)]"}
+                >
+                  {row.map((cell: string, cellIdx: number) => (
+                    <td
+                      key={cellIdx}
+                      className="px-4 py-3 text-[var(--text-secondary)] border-b border-[var(--border-light)] whitespace-nowrap"
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    },
   },
   block: {
     h2: ({ children }: { children?: React.ReactNode }) => <h2>{children}</h2>,
@@ -78,7 +116,7 @@ interface PortableTextProps {
  * PortableText renderer.
  * NOTE: Blocks should be preprocessed server-side with preprocessBlocks()
  * before passing to this component, to convert raw **markdown** spans
- * into proper Portable Text marks.
+ * into proper Portable Text marks, and markdown tables into renderable HTML.
  */
 export function PortableText({ value }: PortableTextProps) {
   if (!value || value.length === 0) return null;
